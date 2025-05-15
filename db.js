@@ -1,3 +1,4 @@
+//C:\Users\CamrenCulpepper(GCT-\jira-backend\db.js
 const mongoose = require('mongoose');
 require('dotenv').config();
 
