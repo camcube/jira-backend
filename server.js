@@ -301,6 +301,32 @@ app.get('/api/jira/search', isAuthenticated, async (req, res) => {
   }
 });
 
+app.post('/api/repair-priorities/batch', async (req, res) => {
+  const { batch } = req.body;
+
+  if (!Array.isArray(batch) || batch.some(b => !b.kqw || !Number.isInteger(b.newPriority))) {
+    return res.status(400).json({ message: 'Invalid batch payload.' });
+  }
+
+  try {
+    const sorted = [...batch].sort((a, b) => a.newPriority - b.newPriority);
+    const updates = await Promise.all(
+      sorted.map((entry, idx) =>
+        TicketPriority.findOneAndUpdate(
+          { kqw: entry.kqw },
+          { priority: idx + 1, updatedAt: new Date() },
+          { upsert: true, new: true }
+        )
+      )
+    );
+    res.json({ message: 'Batch update complete.', updated: updates });
+  } catch (err) {
+    console.error('[MongoDB] Batch priority update error:', err);
+    res.status(500).json({ message: 'Batch update failed.' });
+  }
+});
+
+
 
 // API endpoint to fetch comments for a specific Jira issue
 app.get('/api/jira/issue/:issueKey/comment', isAuthenticated, async (req, res) => {
