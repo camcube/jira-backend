@@ -724,6 +724,12 @@ app.post('/api/repair-priorities/:kqw', async (req, res) => {
 });
 
 
+// Root route to verify deployment is working
+app.get('/', (req, res) => {
+  res.send('✅ Backend is live and ready to receive requests!');
+});
+
+
 
 // Start the server
 app.listen(PORT, '0.0.0.0', () => {
