@@ -469,8 +469,10 @@ app.get('/api/jira/attachment/content/:attachmentId', isAuthenticated, async (re
     });
 
     // Send the binary data back as-is
-    res.setHeader('Content-Type', 'application/octet-stream'); // General binary stream
-    res.status(200).send(response.data);
+   const contentType = response.headers['content-type'] || 'application/octet-stream';
+res.setHeader('Content-Type', contentType);
+res.status(200).send(response.data);
+
   } catch (error) {
     console.error('Error fetching attachment content:', error.response?.data || error.message);
     res.status(error.response?.status || 500).send({
