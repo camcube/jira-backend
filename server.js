@@ -328,6 +328,7 @@ app.post('/api/repair-priorities/batch', async (req, res) => {
 
 
 
+
 // API endpoint to fetch comments for a specific Jira issue
 app.get('/api/jira/issue/:issueKey/comment', isAuthenticated, async (req, res) => {
   try {
@@ -732,7 +733,7 @@ app.get('/api/repair-priorities', async (req, res) => {
 
 app.post('/api/repair-priorities/:kqw', async (req, res) => {
   const { kqw } = req.params;
-  const { newPriority } = req.body;
+  const { newPriority, isQcRework } = req.body;
 
   if (!Number.isInteger(newPriority) || newPriority < 1) {
     return res.status(400).json({ message: 'Invalid priority number.' });
@@ -740,11 +741,11 @@ app.post('/api/repair-priorities/:kqw', async (req, res) => {
 
   try {
     const all = await TicketPriority.find().sort({ priority: 1 });
-    const existing = all.find(t => t.kqw === kqw);
-
     const filtered = all.filter(t => t.kqw !== kqw);
 
-    filtered.splice(newPriority - 1, 0, { kqw, priority: newPriority }); // insert updated
+    // Insert at position 0 if QC Rework
+    const insertIndex = isQcRework ? 0 : newPriority - 1;
+    filtered.splice(insertIndex, 0, { kqw, priority: newPriority });
 
     const updates = await Promise.all(
       filtered.map((entry, idx) =>
@@ -762,6 +763,7 @@ app.post('/api/repair-priorities/:kqw', async (req, res) => {
     res.status(500).json({ message: 'Priority update failed.' });
   }
 });
+
 
 
 // Root route to verify deployment is working
