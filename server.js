@@ -102,15 +102,21 @@ app.set('trust proxy', 1); // 🔐 REQUIRED on Render to trust HTTPS proxy
 
 
 // Session Middleware
+const MongoStore = require('connect-mongo');
+
 app.use(session({
   name: 'connect.sid',
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    collectionName: 'sessions',
+  }),
   cookie: {
     httpOnly: true,
-    secure: true,        // Required for cross-origin cookies
-    sameSite: 'none',    // Required for cookies to work cross-site
+    secure: true,
+    sameSite: 'none',
     maxAge: 8 * 60 * 60 * 1000,
   },
 }));
