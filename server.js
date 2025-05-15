@@ -56,10 +56,12 @@ function getLocalIPAddress() {
 
 const localIP = getLocalIPAddress();
 const FRONTEND_ORIGINS = [
-  `http://${localIP}:4200`,
   'http://localhost:4200',
   'http://127.0.0.1:4200',
+  'https://the-dashboard-d1f19.web.app', // ✅ your deployed frontend
 ];
+
+
 
 
 
