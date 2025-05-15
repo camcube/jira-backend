@@ -107,11 +107,12 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false,        // use true only if HTTPS
-    sameSite: 'lax',     // IMPORTANT: allows cookies in cross-origin requests
+    secure: true,        // Required for cross-origin cookies
+    sameSite: 'none',    // Required for cookies to work cross-site
     maxAge: 8 * 60 * 60 * 1000,
-  },  
+  },
 }));
+
 
 
 app.use((req, res, next) => {
@@ -230,6 +231,9 @@ app.get('/api/jira', (req, res) => {
 
 // Fetch current user info from Jira
 app.get('/api/jira/myself', isAuthenticated, async (req, res) => {
+    console.log('[DEBUG] Session on /search route:', req.session);
+  console.log('[DEBUG] Session user on /search route:', req.session.user);
+  console.log('[DEBUG] Session user encodedCredentials on /search route:', req.session.user.encodedCredentials);
   try {
     const { encodedCredentials } = req.session.user;
 
